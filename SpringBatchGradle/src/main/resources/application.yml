@@ -1,0 +1,25 @@
+logging:
+  level:
+    root: info
+    '[com.spring.SpringBatchGradle]': debug
+
+spring:
+  batch:
+    job:
+      names: ${job.name:NONE}
+  jpa: 
+    open-in-view: true
+    hibernate:
+      ddl-auto: update #create 테이블 만든다.=> 프로젝트 할때마다 실행한다, 최초에만 적용, 후에 update 해야함, 아니면 기존 drop 후 새로만든다.
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl # Entity(테이블) 만들때 변수명 DB필드명에 넣어준다. SpringPhysicalNamingStrategy 카멜 표기법 적용됨 myEmail -> my_email로 변경 
+      use-new-id-generator-mappings: false #jpa 기본 넘버링 전략 사용안함, 프로젝트에 연결된 넘버링 전략 따라감
+    show-sql: true #sql 로깅처리
+    properties:
+      hibernate.format_sql: true # 한줄로 보이는 로깅을 이쁘게 정렬한다.
+  
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@localhost:1521/orcl
+    username: c##BOOT
+    password: boottest
