@@ -1,10 +1,6 @@
 package com.spring.SpringBatchGradle.batch;
 
-
-
-
 import javax.persistence.EntityManagerFactory;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -14,24 +10,27 @@ import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import com.spring.SpringBatchGradle.domain.Dept;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+
+
 /**
+ * @author 	ijhwang
+ * @date 	2022.12.03
+ * @Comment 
+ * JPA Chunkë¥¼ ì´ìš©í•œ ìŠ¤í”„ë§ ë¶€íŠ¸ êµ¬í˜„ 
  * 
- * chunk ±â¹İ 
- * Ã»Å© ´ÜÀ§·Î Ã³¸®ÇÒ ¸ğµç ·¹ÄÚµå¸¦ ¹İº¹ÀûÀ¸·Î ÀĞ¾î¿À´Â ItemReader
- * ÇÊ¼ö´Â ¾Æ´ÏÁö¸¸ ÀĞ¾îµéÀÎ ¾ÆÀÌÅÛÀ» Ã³¸®ÇÏ´Â ItemProcessor
- * ¾ÆÀÌÅÛÀ» ÇÑ ¹ø¿¡ ±â·ÏÇÏ´Â ItemWriter ÀÇ ¼¼°¡Áö ÄÄÆ÷³ÍÆ®·Î ±¸¼º
- * ItemWriterÀÇ ´ÜÀÏ È£ÃâÀº ¹°¸®Àû ¾²±â¸¦ ÀÏ°ıÀûÀ¸·Î Ã³¸®ÇÔÀ¸·Î½á IO ÃÖÀûÈ­¸¦ ÀÌ·ë
- * °¢ Ã»Å©´Â ÀÚÃ¼ Æ®·£Àè¼ÇÀ¸·Î ½ÇÇàÇÏ¸ç, Ã³¸®¿¡ ½ÇÆĞÇß´Ù¸é ¸¶Áö¸·À¸·Î ¼º°øÇÑ Æ®·£Àè¼Ç ÀÌÈÄºÎÅÍ ´Ù½Ã ½ÃÀÛ °¡´É
+ * #chunk 
+ * ItemReader 	 : chunk ë‹¨ìœ„ë¡œ ì²˜ë¦¬í•  ëª¨ë“  ë ˆì½”ë“œë¥¼ ë°˜ë³µì ìœ¼ë¡œ ì½ì–´ì˜¤ëŠ” 
+ * ItemProcessor : í•„ìˆ˜ëŠ” ì•„ë‹ˆì§€ë§Œ ì½ì–´ë“¤ì¸ ì•„ì´í…œì„ ì²˜ë¦¬í•˜ëŠ” 
+ * ItemWriter 	 : ì•„ì´í…œì„ í•œ ë²ˆì— ê¸°ë¡í•˜ëŠ” Writer
+ * 3ê°€ì§€ ì»´í¬ë„ŒíŠ¸ë¡œ êµ¬ì„±
+ * ItemWriterì˜ ë‹¨ì¼ í˜¸ì¶œì€ ë¬¼ë¦¬ì  ì“°ê¸°ë¥¼ ì¼ê´„ì ìœ¼ë¡œ ì²˜ë¦¬í•¨ìœ¼ë¡œì¨ IO ìµœì í™”ë¥¼ ì´ë£¸
+ * ê° ì²­í¬ëŠ” ìì²´ íŠ¸ëœì­ì…˜ìœ¼ë¡œ ì‹¤í–‰í•˜ë©°, ì²˜ë¦¬ì— ì‹¤íŒ¨í–ˆë‹¤ë©´ ë§ˆì§€ë§‰ìœ¼ë¡œ ì„±ê³µí•œ íŠ¸ëœì­ì…˜ ì´í›„ë¶€í„° ë‹¤ì‹œ ì‹œì‘ ê°€ëŠ¥
  * 
  * */
-
-
 @Slf4j
 @RequiredArgsConstructor
 @Configuration
@@ -40,40 +39,31 @@ public class JpaPageJob1 {
 	private final JobBuilderFactory jobBuilderFactory;
 	private final StepBuilderFactory stepBuilderFactory;
 	private final EntityManagerFactory entityManagerFactory;
-	
-	
-	private int chunkSize = 10; // Àß¶ó¼­ ÇØ´ç Å©±â¸¸Å­ DB Ã³¸® 
-	
-	
+
+	private int chunkSize = 10; // ì˜ë¼ì„œ í•´ë‹¹ í¬ê¸°ë§Œí¼ DB ì²˜ë¦¬ 
+
 	@Bean
 	public Job JpaPageJob1_batchBuild() {
-		return jobBuilderFactory.get("jpaPageJob1")
-				.start(JpaPageJob1_step1()).build();
+		return jobBuilderFactory.get("jpaPageJob1").start(JpaPageJob1_step1()).build();
 	}
-	
+
 	@Bean
-	public Step JpaPageJob1_step1(){
-		return stepBuilderFactory.get("jpaPageJob1_step1")
-				.<Dept,Dept>chunk(chunkSize)
-				.reader(jpaPageJob1_dbItemReader())
-				.writer(jpaPageJob1_printItenWriter())
-				.build();
+	public Step JpaPageJob1_step1() {
+		return stepBuilderFactory.get("jpaPageJob1_step1").<Dept, Dept>chunk(chunkSize)
+				.reader(jpaPageJob1_dbItemReader()).writer(jpaPageJob1_printItenWriter()).build();
 	}
-	
+
 	@Bean
-	public JpaPagingItemReader<Dept> jpaPageJob1_dbItemReader(){
-		return new JpaPagingItemReaderBuilder<Dept>()
-				.name("jpaPageJob1_dbItemReader")
-				.entityManagerFactory(entityManagerFactory)
-				.pageSize(chunkSize)
-				.queryString("SELECT d FROM Dept d order by deptno asc")
-				.build();
+	public JpaPagingItemReader<Dept> jpaPageJob1_dbItemReader() {
+		return new JpaPagingItemReaderBuilder<Dept>().name("jpaPageJob1_dbItemReader")
+				.entityManagerFactory(entityManagerFactory).pageSize(chunkSize)
+				.queryString("SELECT d FROM Dept d order by deptno asc").build();
 	}
-	
+
 	@Bean
-	public ItemWriter<Dept> jpaPageJob1_printItenWriter(){
-		return list ->{
-			for(Dept dept : list) {
+	public ItemWriter<Dept> jpaPageJob1_printItenWriter() {
+		return list -> {
+			for (Dept dept : list) {
 				log.debug(dept.toString());
 			}
 		};

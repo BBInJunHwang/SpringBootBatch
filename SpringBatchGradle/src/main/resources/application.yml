@@ -19,7 +19,7 @@ spring:
       hibernate.format_sql: true # 한줄로 보이는 로깅을 이쁘게 정렬한다.
   
   datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
-    url: jdbc:oracle:thin:@localhost:1521/orcl
-    username: c##BOOT
-    password: boottest
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/myDB?serverTimezone=Asia/Seoul
+    username: root
+    password: 1q2w3e4r!@

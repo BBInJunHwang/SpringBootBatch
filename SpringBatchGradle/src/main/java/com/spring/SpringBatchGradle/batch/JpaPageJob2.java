@@ -23,53 +23,48 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * ÇÑ¹ø ¼º°øÇÑ ¹èÄ¡´Â version ´Ù¸£°Å³ª ÆÄ¶ó¹ÌÅÍ°¡ ´Ù¸£Áö ¾Ê´ÂÇÑ ½ÇÇàÇÏÁö ¾Ê´Â´Ù.
+ * @author 	ijhwang
+ * @date 	2022.12.03
+ * @Comment 
+ * JPA Chunkë¥¼ ì´ìš©í•œ ìŠ¤í”„ë§ ë¶€íŠ¸ êµ¬í˜„ Version ê´€ë¦¬
  * 
- * ½ºÇÁ¸µ ¹èÄ¡´Â ÀÚÃ¼ÀûÀ¸·Î ½ºÄÉÁÙ¸µ ±â´ÉÀÌ ¾øÀ½
- * ¿ÜºÎ¿¡¼­ cronTab/Jeknins »ç¿ëÇØ¼­ JOB ÆÄ¶ó¹ÌÅÍ ³Ñ°ÜÁà¾ßÇÔ
- * Å×½ºÆ®¸¦ À§ÇØ¼­ program argument ÅëÇØ job name°ú job parameter Àü´Ş 
+ * í•œë²ˆ ì„±ê³µí•œ ë°°ì¹˜ëŠ” version ë‹¤ë¥´ê±°ë‚˜ íŒŒë¼ë¯¸í„°ê°€ ë‹¤ë¥´ì§€ ì•ŠëŠ”í•œ ì‹¤í–‰í•˜ì§€ ì•ŠëŠ”ë‹¤.
  * 
- * 
- * JobInstance 		- Job ½ÇÇà´ÜÀ§, Job ½ÇÇà½Ã ÇÏ³ªÀÇ JobInstance »ı¼º
- * 			     	ex) ¿ÀÀü,¿ÀÈÄ Job ½ÇÇà½Ã °¢°¢ »ı¼ºµÇ¸ç, ´Ù½Ã ¿ÀÀü Job ½ÇÇà ½Ã ÀÎ½ºÅÏ½º »ı¼ºx ¿ÀÀü ½ÇÇà ¹èÄ¡¸¸ ´Ù½Ã ½ÇÇà
- * 
- * Job Execution 	- JobInstanceÀÇ ½ÇÇà½Ãµµ ´ëÇÑ °´Ã¼
- * 					ex) ¿ÀÀü ÀÎ½ºÅÏ½º ½ÇÆĞ½Ã ½ÇÆĞÁöÁ¡ ºÎÅÍ ´Ù½Ã½ÇÇàµÇ¸ç, ÀÌ°æ¿ì ½ÇÆĞ ÀÎ½ºÅÏ½º, ¼º°ø ÀÎ½ºÅÏ½º »õ·Î»ı±è È÷½ºÅä¸®¿ë
- * 
- * Step				- Job ¹èÄ¡Ã³¸® Á¤ÀÇ, ¼øÂ÷ÀûÀ¸·Î Ä¸½¶È­, JobÀº ÇÑ°³ÀÌ»ó Step ÇÊ¿ä 
- * 					Tasklet°ú chunk Ã³¸®¹æ½Ä Áö¿ø
- * 
- * Step Execution	- Step ½ÇÇà½Ãµµ ´ëÇÑ °´Ã¼, JobÀÌ ¿©·¯°³ StepÀ¸·Î ±¸¼º½Ã ÀÌÀü Step ½ÇÆĞ½Ã ´ÙÀ½´Ü°è ½ÇÇàx, stepExecution »ı¼ºx
- * 					read ,write ,commit ¼ö µî ÀúÀå
- * 
- * Execution Context - Job¿¡¼­ µ¥ÀÌÅÍ¸¦ °øÀ¯ÇÒ ¼ö ÀÖ´Â µ¥ÀÌÅÍ ÀúÀå¼Ò, Job, Step 2°¡Áö Á¦°ø
- * 					JobExecution Context´Â Commit½ÃÁ¡ ÀúÀå, StepExecution Context´Â ½ÇÇà »çÀÌ ÀúÀå
- * 					Execution Context ÅëÇØ Step°£ µ¥ÀÌÅÍ °øÀ¯ ¹× Job ½ÇÆĞ½Ã ¸¶Áö¸· ½ÇÇà°ª Àç±¸¼º °¡´É 
- * 
- * JobRepository	 - ¸ğµç Batch Ã³¸® Á¤º¸°¡Áü, Job ½ÇÇà½Ã job,step Execution »ı¼º
- * 					 Execution Á¤º¸¸¦ ÀúÀåÇÏ°í Á¶È¸
- * 
- * JobLauncher		 - Job°ú JobParameters »ç¿ëÇØ Job ½ÇÇà °´Ã¼
- * 
- * ItemReader		 - Step¿¡¼­ item ÀĞ´Â ÀÎÅÍÆäÀÌ½º 
- * 
- * ItemWriter		 - Ã³¸®µÈ µ¥ÀÌÅÍ¸¦ insert,update,send(MQ·Î Àü´Ş) ÇÒ¶§ »ç¿ë
- * 						ItemÀ» chunk ´ÜÀ§·Î ¹­¾î Ã³¸®
- * 
- * ItemProcessor	 - Reader¿¡¼­ ÀĞÀº item Ã³¸®
- * 					 ÇÊ¼ö¿ä¼Ò´Â ¾Æ´Ï¸ç, µ¥ÀÌÅÍ °¡°ø µî ºñÁö´Ï½º ·ÎÁ÷
+ * ìŠ¤í”„ë§ ë°°ì¹˜ëŠ” ìì²´ì ìœ¼ë¡œ ìŠ¤ì¼€ì¤„ë§ ê¸°ëŠ¥ì´ ì—†ìŒ
+ * ì™¸ë¶€ì—ì„œ cronTab/Jeknins ì‚¬ìš©í•´ì„œ JOB íŒŒë¼ë¯¸í„° ë„˜ê²¨ì¤˜ì•¼í•¨
+ * í…ŒìŠ¤íŠ¸ë¥¼ ìœ„í•´ì„œ program argument í†µí•´ job nameê³¼ job parameter ì „ë‹¬ 
  * 
  * 
+ * JobInstance 		- Job ì‹¤í–‰ë‹¨ìœ„, Job ì‹¤í–‰ì‹œ í•˜ë‚˜ì˜ JobInstance ìƒì„±
+ * 			     	ex) ì˜¤ì „,ì˜¤í›„ Job ì‹¤í–‰ì‹œ ê°ê° ìƒì„±ë˜ë©°, ë‹¤ì‹œ ì˜¤ì „ Job ì‹¤í–‰ ì‹œ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±x ì˜¤ì „ ì‹¤í–‰ ë°°ì¹˜ë§Œ ë‹¤ì‹œ ì‹¤í–‰
  * 
+ * Job Execution 	- JobInstanceì˜ ì‹¤í–‰ì‹œë„ ëŒ€í•œ ê°ì²´
+ * 					ex) ì˜¤ì „ ì¸ìŠ¤í„´ìŠ¤ ì‹¤íŒ¨ì‹œ ì‹¤íŒ¨ì§€ì  ë¶€í„° ë‹¤ì‹œì‹¤í–‰ë˜ë©°, ì´ê²½ìš° ì‹¤íŒ¨ ì¸ìŠ¤í„´ìŠ¤, ì„±ê³µ ì¸ìŠ¤í„´ìŠ¤ ìƒˆë¡œìƒê¹€ íˆìŠ¤í† ë¦¬ìš©
  * 
+ * Step				- Job ë°°ì¹˜ì²˜ë¦¬ ì •ì˜, ìˆœì°¨ì ìœ¼ë¡œ ìº¡ìŠí™”, Jobì€ í•œê°œì´ìƒ Step í•„ìš” 
+ * 					Taskletê³¼ chunk ì²˜ë¦¬ë°©ì‹ ì§€ì›
  * 
+ * Step Execution	- Step ì‹¤í–‰ì‹œë„ ëŒ€í•œ ê°ì²´, Jobì´ ì—¬ëŸ¬ê°œ Stepìœ¼ë¡œ êµ¬ì„±ì‹œ ì´ì „ Step ì‹¤íŒ¨ì‹œ ë‹¤ìŒë‹¨ê³„ ì‹¤í–‰x, stepExecution ìƒì„±x
+ * 					read ,write ,commit ìˆ˜ ë“± ì €ì¥
+ * 
+ * Execution Context - Jobì—ì„œ ë°ì´í„°ë¥¼ ê³µìœ í•  ìˆ˜ ìˆëŠ” ë°ì´í„° ì €ì¥ì†Œ, Job, Step 2ê°€ì§€ ì œê³µ
+ * 					JobExecution ContextëŠ” Commitì‹œì  ì €ì¥, StepExecution ContextëŠ” ì‹¤í–‰ ì‚¬ì´ ì €ì¥
+ * 					Execution Context í†µí•´ Stepê°„ ë°ì´í„° ê³µìœ  ë° Job ì‹¤íŒ¨ì‹œ ë§ˆì§€ë§‰ ì‹¤í–‰ê°’ ì¬êµ¬ì„± ê°€ëŠ¥ 
+ * 
+ * JobRepository	 - ëª¨ë“  Batch ì²˜ë¦¬ ì •ë³´ê°€ì§, Job ì‹¤í–‰ì‹œ job,step Execution ìƒì„±
+ * 					 Execution ì •ë³´ë¥¼ ì €ì¥í•˜ê³  ì¡°íšŒ
+ * 
+ * JobLauncher		 - Jobê³¼ JobParameters ì‚¬ìš©í•´ Job ì‹¤í–‰ ê°ì²´
+ * 
+ * ItemReader		 - Stepì—ì„œ item ì½ëŠ” ì¸í„°í˜ì´ìŠ¤ 
+ * 
+ * ItemWriter		 - ì²˜ë¦¬ëœ ë°ì´í„°ë¥¼ insert,update,send(MQë¡œ ì „ë‹¬) í• ë•Œ ì‚¬ìš©
+ * 						Itemì„ chunk ë‹¨ìœ„ë¡œ ë¬¶ì–´ ì²˜ë¦¬
+ * 
+ * ItemProcessor	 - Readerì—ì„œ ì½ì€ item ì²˜ë¦¬
+ * 					 í•„ìˆ˜ìš”ì†ŒëŠ” ì•„ë‹ˆë©°, ë°ì´í„° ê°€ê³µ ë“± ë¹„ì§€ë‹ˆìŠ¤ ë¡œì§
  * 
  * */
-
-
-
-
-
 
 
 @Slf4j
@@ -82,7 +77,7 @@ public class JpaPageJob2 {
 	private final EntityManagerFactory entityManagerFactory;
 	
 	
-	private int chunkSize = 20; // Àß¶ó¼­ ÇØ´ç Å©±â¸¸Å­ DB Ã³¸® 
+	private int chunkSize = 20; // ì˜ë¼ì„œ í•´ë‹¹ í¬ê¸°ë§Œí¼ DB ì²˜ë¦¬ 
 	
 	
 	@Bean
@@ -100,7 +95,6 @@ public class JpaPageJob2 {
 				.writer(jpaPageJob2_dbItenWriter())
 				.build();
 	}
-	
 
 	@Bean
 	public JpaPagingItemReader<Dept> jpaPageJob2_dbItemReader(){
@@ -119,12 +113,11 @@ public class JpaPageJob2 {
 		};
 	}
 	
-	
 	@Bean
 	public JpaItemWriter<Dept2> jpaPageJob2_dbItenWriter(){
-		JpaItemWriter<Dept2> jpaItemWriter = new JpaItemWriter<>();		// JpaItemWriter »ç¿ë½Ã ¿µ¼Ó¼º °ü¸®¸¦ À§ÇÑ EntityManager Àü´Ş ÇÊ¿ä
-		jpaItemWriter.setEntityManagerFactory(entityManagerFactory);	// ³Ñ¾î¿Â Entity¸¦ µ¥ÀÌÅÍº£ÀÌ½º¿¡ ¹İ¿µ
-																		// Entity Å¬·¡½º¸¦ Á¦³×¸¯ Å¸ÀÔ -> ³Ñ¾î¿Â ItemÀ» ±×´ë·Î entityManger.merge()·Î Å×ÀÌºí¿¡ ¹İ¿µ
+		JpaItemWriter<Dept2> jpaItemWriter = new JpaItemWriter<>();		// JpaItemWriter ì‚¬ìš©ì‹œ ì˜ì†ì„± ê´€ë¦¬ë¥¼ ìœ„í•œ EntityManager ì „ë‹¬ í•„ìš”
+		jpaItemWriter.setEntityManagerFactory(entityManagerFactory);	// ë„˜ì–´ì˜¨ Entityë¥¼ ë°ì´í„°ë² ì´ìŠ¤ì— ë°˜ì˜
+																		// Entity í´ë˜ìŠ¤ë¥¼ ì œë„¤ë¦­ íƒ€ì… -> ë„˜ì–´ì˜¨ Itemì„ ê·¸ëŒ€ë¡œ entityManger.merge()ë¡œ í…Œì´ë¸”ì— ë°˜ì˜
 		return jpaItemWriter;
 	}
 }

@@ -15,13 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 
 
 /**
- * TaskletÀº °è¼Ó ÁøÇà or ³¡³¾Áö 2°¡Áö¸¸ Á¦°ø 
- * chunk¿Í ´Þ¸® RPW ·ÎÁ÷ÀÌ ³ª´²Áö´Â°Ô ¾Æ´Ñ, 1È¸¼º or RPW°¡ ÇÑ¹ø¿¡ ¸ð¾Æ³õÀº ºñÁö´Ï½º ·ÎÁ÷ »ç¿ë
- * chunk¿Í ´Þ¸® ¸ÞÅ¸ Å×ÀÌºí¿¡ read,write count ¾È³²À½ 
- * -> Á÷Á¢ ±¸ÇöÇØ¾ßÇÔ 
+ * Taskletì€ ê³„ì† ì§„í–‰ or ëë‚¼ì§€ 2ê°€ì§€ë§Œ ì œê³µ 
+ * chunkì™€ ë‹¬ë¦¬ RPW ë¡œì§ì´ ë‚˜ëˆ ì§€ëŠ”ê²Œ ì•„ë‹Œ, 1íšŒì„± or RPWê°€ í•œë²ˆì— ëª¨ì•„ë†“ì€ ë¹„ì§€ë‹ˆìŠ¤ ë¡œì§ ì‚¬ìš©
+ * chunkì™€ ë‹¬ë¦¬ ë©”íƒ€ í…Œì´ë¸”ì— read,write count ì•ˆë‚¨ìŒ 
+ * -> ì§ì ‘ êµ¬í˜„í•´ì•¼í•¨ 
  * 
- * RepeatStatus.FINISHED	- Ã³¸®ÀÇ ¼º°ø ¿©ºÎ °ü°è¾øÀÌ ÅÂ½ºÅ©¸´À» ¿Ï·áÇÏ°í ´ÙÀ½ Ã³¸®¸¦ ÀÌ¾î¼­ ÇÏ°Ú´Ù
- * RepeatStatus.CONTINUABLE - ½ºÇÁ¸µ ¹èÄ¡¿¡°Ô ÇØ´ç ÅÂ½ºÅ©¸´À» ´Ù½Ã ½ÇÇà
+ * RepeatStatus.FINISHED	- ì²˜ë¦¬ì˜ ì„±ê³µ ì—¬ë¶€ ê´€ê³„ì—†ì´ íƒœìŠ¤í¬ë¦¿ì„ ì™„ë£Œí•˜ê³  ë‹¤ìŒ ì²˜ë¦¬ë¥¼ ì´ì–´ì„œ í•˜ê² ë‹¤
+ * RepeatStatus.CONTINUABLE - ìŠ¤í”„ë§ ë°°ì¹˜ì—ê²Œ í•´ë‹¹ íƒœìŠ¤í¬ë¦¿ì„ ë‹¤ì‹œ ì‹¤í–‰
  * 
  * */
 
@@ -38,14 +38,14 @@ public class TaskletJob {
 	public Job taskletJob_batchBuild() {
 		return jobBuilderFactory.get("taskletJob")
 				.start(taskletJob_step1())
-				.next(taskletJob_step2(null))	// next ÀÌ¿ëÇØ¼­ step °£ ¿¬°áÇÑ´Ù.
+				.next(taskletJob_step2(null))	// next ì´ìš©í•´ì„œ step ê°„ ì—°ê²°í•œë‹¤.
 				.build();
 	}
 	
 	
 	/**
-	 * contribution - ÇöÀç ´Ü°è ½ÇÇàÀ» ¾÷µ¥ÀÌÆ®ÇÏ±â À§ÇØ ´Ù½Ã Àü´ÞµÇ´Â º¯°æ °¡´ÉÇÑ »óÅÂ
-     * chunkContext - È£Ãâ °£¿¡´Â °øÀ¯µÇÁö¸¸ Àç½ÃÀÛ °£¿¡´Â °øÀ¯µÇÁö ¾Ê´Â ¼Ó¼º
+	 * contribution - í˜„ìž¬ ë‹¨ê³„ ì‹¤í–‰ì„ ì—…ë°ì´íŠ¸í•˜ê¸° ìœ„í•´ ë‹¤ì‹œ ì „ë‹¬ë˜ëŠ” ë³€ê²½ ê°€ëŠ¥í•œ ìƒíƒœ
+     * chunkContext - í˜¸ì¶œ ê°„ì—ëŠ” ê³µìœ ë˜ì§€ë§Œ ìž¬ì‹œìž‘ ê°„ì—ëŠ” ê³µìœ ë˜ì§€ ì•ŠëŠ” ì†ì„±
 	 * */
 	@Bean
 	public Step taskletJob_step1(){
@@ -57,7 +57,7 @@ public class TaskletJob {
 	}
 	
 	@Bean
-	@JobScope	// late binding - Bean »ý¼º½ÃÁ¡ÀÌ ¾ÖÇÃ¸®ÄÉÀÌ¼Ç ±¸µ¿ÀÌ ¾Æ´Ñ ÁöÁ¤µÈ scope°¡ ½ÇÇàµÇ´Â ½ÃÁ¡ -> ·ÎÁ÷ÀÌ ½ÇÇàµÇ´Â ½ÃÁ¡¿¡ °ªµé ÀúÀå ÈÄ ´ÙÀ½ step¿¡ Àü´Þ or ½ÇÆÐÁöÁ¡ ÀçÃ³¸®
+	@JobScope	// late binding - Bean ìƒì„±ì‹œì ì´ ì• í”Œë¦¬ì¼€ì´ì…˜ êµ¬ë™ì´ ì•„ë‹Œ ì§€ì •ëœ scopeê°€ ì‹¤í–‰ë˜ëŠ” ì‹œì  -> ë¡œì§ì´ ì‹¤í–‰ë˜ëŠ” ì‹œì ì— ê°’ë“¤ ì €ìž¥ í›„ ë‹¤ìŒ stepì— ì „ë‹¬ or ì‹¤íŒ¨ì§€ì  ìž¬ì²˜ë¦¬
 	public Step taskletJob_step2(@Value("#{jobParameters[date]}") String date){
 		return stepBuilderFactory.get("taskletJob_step2")
 				.tasklet((a,b)->{
